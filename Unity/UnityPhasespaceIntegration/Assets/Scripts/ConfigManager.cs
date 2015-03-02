@@ -4,7 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 
 public class ConfigManager : MonoBehaviour {
-	public string configFile = "traces.conf";
+	public string configFile = "unity.conf";
 
 	private Dictionary<string, string> properties;
 
