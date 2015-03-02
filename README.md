@@ -1,15 +1,14 @@
-Unity / Phasespace integration framework
-====
+# Unity / Phasespace integration framework
 
-Important note about required libraries!
-----
+A framework for integrating Unity with the Phasespace motion capture system for use in creating applications that use real-time data.
+
+## Important note about required libraries!
 
 This framework relies on 'libowlsock.dll', which is provided by Phasespace to their customers.
 I am not including it in this repository to avoid distribution issues.
 To get this library, please contact Phasespace, and ask them for access to the Phasespace SDK.
 
-Important note about .gitignore
-----
+## Important note about .gitignore!
 
 These files are ignored:
 - .DS_Store (Silly osx files that don't belong in repo)
