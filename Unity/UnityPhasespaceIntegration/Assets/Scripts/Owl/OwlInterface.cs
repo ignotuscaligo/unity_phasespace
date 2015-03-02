@@ -27,14 +27,7 @@ public class OwlInterface : MonoBehaviour {
 	private static int maxRigids = 32;
 	private static int maxCameras = 32;
 
-	public OwlInterface() {
-		//markers = new Phasespace.NativeMarker[maxMarkers];
-		//rigids = new Phasespace.NativeRigid[maxRigids];
-		//cameras = new Phasespace.NativeCamera[maxCameras];
-	}
-
 	public void Awake() {
-		Debug.Log("Owl Awake()");
 		if (configuration) {
 			// tell config to hold place for 'owl_address', use serverAddress if not set in config
 			configuration.RegisterProperty("owl_address", defaultValue: serverAddress);
@@ -42,7 +35,6 @@ public class OwlInterface : MonoBehaviour {
 	}
 
 	public void Start() {
-		Debug.Log("Owl Start()");
 		if (configuration) {
 			// get value from file if exists, else use above value
 			serverAddress = configuration.GetProperty("owl_address");
@@ -100,9 +92,9 @@ public class OwlInterface : MonoBehaviour {
 			connected = true;
 			serverRunning = connected;
 		} else {
-			// get some markers
 			bool gotData = false;
 			if (getMarkers) {
+				// get markers
 				int n = 0;
 				do {
 					n = Owl.GetMarkers(ref markers);
@@ -122,6 +114,7 @@ public class OwlInterface : MonoBehaviour {
 			}
 
 			if (getRigids) {
+				// get rigid bodies
 				int n = 0;
 				do {
 					n = Owl.GetRigids(ref rigids);
@@ -141,6 +134,7 @@ public class OwlInterface : MonoBehaviour {
 			}
 
 			if (getCameras) {
+				// get cameras
 				int n = Owl.GetCameras(ref cameras);
 				if (n > 0) {
 					gotData = true;
