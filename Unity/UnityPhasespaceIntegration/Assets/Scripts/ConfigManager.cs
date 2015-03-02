@@ -68,8 +68,3 @@ public class ConfigManager : MonoBehaviour {
 		properties[key] = value;
 	}
 }
-
-public class VisibleKeyValuePair {
-	public string key;
-	public string value;
-}
