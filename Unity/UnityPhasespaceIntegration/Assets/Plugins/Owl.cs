@@ -58,10 +58,14 @@ namespace Phasespace {
 		}
 
 		public static Quaternion ConvertQuaternion(Quaternion input) {
+			// comes in as w, x, y, z
+			// unity is x, y, -z, -w
+			// need to invert z, w due to handedness
 			return new Quaternion(input.x, input.y, -input.z, -input.w);
 		}
 	}
 
+	// "native" marker class, ingests structure from owl
 	[StructLayout(LayoutKind.Sequential), Serializable]
 	public struct NativeMarker {
 		public int id;
@@ -73,6 +77,7 @@ namespace Phasespace {
 		public uint flag;
 	};
 
+	// "nice" marker class
 	[Serializable]
 	public class Marker {
 		public int id;
@@ -91,13 +96,14 @@ namespace Phasespace {
 			flag = native.flag;
 		}
 
-		public static explicit operator Marker(NativeMarker native) {
-			Marker ret = new Marker();
+		public static explicit operator Phasespace.Marker(NativeMarker native) {
+			Phasespace.Marker ret = new Phasespace.Marker();
 			ret.SetFromNative(native);
 			return ret;
 		}
 	}
 
+	// "native" rigid body class, ingests structure from owl
 	[StructLayout(LayoutKind.Sequential), Serializable]
 	public struct NativeRigid {
 		public int id;
@@ -108,6 +114,7 @@ namespace Phasespace {
 		public uint flag;
 	};
 
+	// "nice" rigid body class
 	[Serializable]
 	public class Rigid {
 		public int id;
@@ -117,12 +124,14 @@ namespace Phasespace {
 		public float condition;
 		public uint flag;
 
-		public void SetFromNative(NativeRigid native) {
+		public void SetFromNative(NativeRigid native, bool ignoreLowCond=false) {
 			id = native.id;
-			position = new Vector3(native.pose.px, native.pose.py, -native.pose.pz);
-			// comes in as w, x, y, z
-			// unity is -x, -z, -y, w
-			orientation = Owl.ConvertQuaternion(new Quaternion(native.pose.rx, native.pose.ry, native.pose.rz, native.pose.rw));
+			if (!ignoreLowCond || (ignoreLowCond && native.cond > 0)) {
+				position = new Vector3(native.pose.px, native.pose.py, -native.pose.pz);
+				// incoming quaternion needs to be converted to Unity's quaternion
+				orientation = Owl.ConvertQuaternion(
+						new Quaternion(native.pose.rx, native.pose.ry, native.pose.rz, native.pose.rw));
+			}
 			condition = native.cond;
 			flag = native.flag;
 		}
@@ -134,6 +143,7 @@ namespace Phasespace {
 		}
 	}
 
+	// "native" camera class, ingests structure from owl
 	[StructLayout(LayoutKind.Sequential), Serializable]
 	public struct NativeCamera {
 		public int id;
@@ -143,6 +153,7 @@ namespace Phasespace {
 		public uint flag;
 	};
 
+	// "nice" camera class
 	[Serializable]
 	public class Camera {
 		public int id;
@@ -151,12 +162,14 @@ namespace Phasespace {
 		public float condition;
 		public uint flag;
 
-		public void SetFromNative(NativeCamera native) {
+		public void SetFromNative(NativeCamera native, bool ignoreLowCond=false) {
 			id = native.id;
-			position = new Vector3(native.pose.px, native.pose.py, -native.pose.pz);
-			// comes in as w, x, y, z
-			// unity is -x, -z, -y, w
-			orientation = Owl.ConvertQuaternion(new Quaternion(native.pose.rx, native.pose.ry, native.pose.rz, native.pose.rw));
+			if (!ignoreLowCond || (ignoreLowCond && native.cond > 0)) {
+				position = new Vector3(native.pose.px, native.pose.py, -native.pose.pz);
+				// incoming quaternion needs to be converted to Unity's quaternion
+				orientation = Owl.ConvertQuaternion(
+						new Quaternion(native.pose.rx, native.pose.ry, native.pose.rz, native.pose.rw));
+			}
 			condition = native.cond;
 			flag = native.flag;
 		}
@@ -168,6 +181,7 @@ namespace Phasespace {
 		}
 	}
 
+	// object that ingests the pose array from owl
 	[StructLayout(LayoutKind.Sequential), Serializable]
 	public struct Pose {
 		public float px;
@@ -179,6 +193,7 @@ namespace Phasespace {
 		public float rz;
 	}
 
+	// Owl errors
 	public enum Error {
 		NoError = 0x0000,
 		InvalidValue = 0x0020,
@@ -193,6 +208,7 @@ namespace Phasespace {
 		Disable = 0x0103
 	};
 
+	// Server flags
 	public enum InitFlags {
 		Slave = 0x0001,
 		File = 0x0002,
@@ -206,13 +222,13 @@ namespace Phasespace {
 		CalibPlanar = 0x0F00
 	};
 
-	/* Gets */
+	// Gets
 	public enum Get {
 		Version = 0x0500,
 		FrameNumber = 0x0510
 	};
 
-	/* Sets */
+	// Sets
 	public enum Set {
 		Frequency = 0x0200,
 		Streaming = 0x0201,
@@ -229,13 +245,13 @@ namespace Phasespace {
 		FrameBufferSize = 0x02B0
 	};
 
-	/* Trackers */
+	// Trackers
 	public enum TrackerType {
 		Point = 0x0300,
 		Rigid = 0x0301
 	};
 
-	/* Markers */
+	// Markers
 	public enum MarkerCommand {
 		SetLed = 0x0400,
 		SetPosition = 0x0401,
@@ -245,6 +261,8 @@ namespace Phasespace {
 
 
 /*
+Unimplemented enumerations:
+
 // planar tracker (may be temporary)
 OWL_PLANAR_TRACKER      0x030A
 
@@ -280,10 +298,7 @@ OWL_CALIB_ACTIVE        0x0C30
 
 // planar calib tracker (may be temporary)
 OWL_CALIBPL_TRACKER     0x0CA1
-*/
 
-
-/*
 // calibration only
 OWL_CALIB_STATUS        0x0C51
 OWL_CALIB_ERROR         0x0C52
