@@ -4,7 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 
 public class ConfigManager : MonoBehaviour {
-	public string configFile = "traces.conf";
+	public string configFile = "unity.conf";
 
 	private Dictionary<string, string> properties;
 
@@ -16,14 +16,14 @@ public class ConfigManager : MonoBehaviour {
 		Debug.Log("Loading configuration");
 		string fullPath = Application.dataPath+"/"+configFile;
 		if (File.Exists(fullPath)) {
-			readPropertiesFromFile(fullPath);
+			ReadPropertiesFromFile(fullPath);
 		}
 		Debug.Log("Writing file with registered properties");
-		writePropertiesToFile(fullPath);
+		WritePropertiesToFile(fullPath);
 		Debug.Log("Configuration finished");
 	}
 
-	private void readPropertiesFromFile(string path) {
+	private void ReadPropertiesFromFile(string path) {
 		Debug.Log(String.Format("Reading properties from file: '{0}'", path));
 		string[] lines = File.ReadAllLines(path);
 		foreach (string line in lines) {
@@ -38,7 +38,7 @@ public class ConfigManager : MonoBehaviour {
 		}
 	}
 
-	private void writePropertiesToFile(string path) {
+	private void WritePropertiesToFile(string path) {
 		Debug.Log(String.Format("Writing properties to file: '{0}'", path));
 		List<string> fileData = new List<string>();
 		foreach (string key in properties.Keys) {
@@ -67,9 +67,4 @@ public class ConfigManager : MonoBehaviour {
 		RegisterProperty(key, defaultValue: value);
 		properties[key] = value;
 	}
-}
-
-public class VisibleKeyValuePair {
-	public string key;
-	public string value;
 }
